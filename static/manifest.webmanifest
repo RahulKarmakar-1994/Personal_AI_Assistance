@@ -1,0 +1,11 @@
+{
+  "name": "Smriti Personal AI",
+  "short_name": "Smriti",
+  "description": "Offline-first reminders, notes, expenses, payments, habits and AI assistance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f6ef",
+  "theme_color": "#163e31",
+  "icons": [{ "src": "/static/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
+

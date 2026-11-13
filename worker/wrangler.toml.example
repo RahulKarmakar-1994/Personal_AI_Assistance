@@ -1,0 +1,6 @@
+name = "smriti-groq-proxy"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+# Store GROQ_API_KEY and NILA_APP_TOKEN with `wrangler secret put`, never here.
+

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#11221c" />
+    <meta name="description" content="A private, local-first personal AI assistant." />
+    <title>Smriti — Personal AI</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand-row">
+          <div class="brand-mark">N</div>
+          <div><strong>Smriti</strong><span>Personal AI</span></div>
+          <button class="icon-button mobile-only" id="closeSidebar" aria-label="Close menu">×</button>
+        </div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-item active" data-view="dashboard">⌂ <span>Today</span></button>
+          <button class="nav-item" data-view="chat">✦ <span>Assistant</span></button>
+          <button class="nav-item" data-view="calendar">□ <span>Calendar</span></button>
+          <button class="nav-item" data-view="notes">▤ <span>Notes</span></button>
+          <button class="nav-item" data-view="expenses">₹ <span>Expenses</span></button>
+          <button class="nav-item" data-view="finance">◈ <span>Finance</span></button>
+          <button class="nav-item" data-view="habits">◎ <span>Habits</span></button>
+          <button class="nav-item" data-view="discover">⌁ <span>Discover</span></button>
+        </nav>
+        <button class="new-chat" id="newChat"><span>＋</span> New conversation</button>
+        <div class="section-label">Recent</div>
+        <nav class="conversation-list" id="conversationList" aria-label="Conversations"></nav>
+        <div class="sidebar-footer">
+          <button class="sidebar-action" id="openSettings">⚙ <span>Settings</span></button>
+          <div class="status-row"><i id="statusDot"></i><span id="statusText">Checking Ollama…</span></div>
+        </div>
+      </aside>
+
+      <main class="chat-area" id="mainArea">
+        <header class="topbar">
+          <button class="icon-button mobile-only" id="openSidebar" aria-label="Open menu">☰</button>
+          <div><strong id="chatTitle">Today</strong><span id="modelName">Loading assistant…</span></div>
+          <div class="topbar-actions"><button class="icon-button" data-voice-capture aria-label="Add with voice" title="Add with voice">◉</button><button class="icon-button" id="themeToggle" aria-label="Change theme">☼</button></div>
+        </header>
+
+        <section class="workspace" id="dashboardView">
+          <div class="dashboard-head">
+            <div><p class="eyebrow">YOUR DAY</p><h1 id="greeting">Good day</h1><p id="todayDate"></p></div>
+            <div class="quick-actions"><button data-add="task">＋ Task</button><button data-add="event">＋ Event</button><button data-add="note">＋ Note</button></div>
+          </div>
+          <div class="dashboard-grid">
+            <article class="dash-card tasks-card"><header><div><span class="card-icon">✓</span><h2>Tasks</h2></div><button data-add="task">＋</button></header><div id="todayTasks" class="item-list"></div></article>
+            <article class="dash-card"><header><div><span class="card-icon gold">◷</span><h2>Schedule</h2></div><button data-add="event">＋</button></header><div id="todayEvents" class="item-list"></div></article>
+            <article class="dash-card"><header><div><span class="card-icon blue">▤</span><h2>Pinned notes</h2></div><button data-add="note">＋</button></header><div id="pinnedNotes" class="note-grid"></div></article>
+            <article class="dash-card"><header><div><span class="card-icon gold">₹</span><h2>Payments due</h2></div><button data-add="payment">＋</button></header><div id="duePayments" class="item-list"></div></article>
+            <article class="dash-card"><header><div><span class="card-icon">◎</span><h2>Habits</h2></div><button data-add="habit">＋</button></header><div id="todayHabits" class="item-list"></div></article>
+            <article class="dash-card briefing-card"><p class="eyebrow">DAILY FOCUS</p><h2>Ready when you are.</h2><p>Ask Smriti to organize your priorities, draft something, or help you think through the day.</p><button id="planDay">Plan my day with Smriti →</button></article>
+          </div>
+        </section>
+
+        <section class="messages hidden" id="messages" aria-live="polite">
+          <div class="welcome" id="welcome">
+            <div class="welcome-mark">N</div>
+            <p class="eyebrow">LOCAL · PRIVATE · YOURS</p>
+            <h1>What can I help you with?</h1>
+            <p>Chat with your local AI. Your conversations stay on this computer.</p>
+            <div class="suggestions">
+              <button data-prompt="Help me plan my priorities for today."><b>Plan my day</b><span>Turn a busy list into a clear plan</span></button>
+              <button data-prompt="Help me summarize a research idea clearly."><b>Clarify an idea</b><span>Organize a research thought</span></button>
+              <button data-prompt="Draft a short, professional email for me."><b>Draft an email</b><span>Start with a professional structure</span></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace hidden" id="calendarView">
+          <div class="page-head"><div><p class="eyebrow">SCHEDULE</p><h1>Calendar</h1></div><button class="primary" data-add="event">＋ Add event</button></div>
+          <div id="allEvents" class="collection-grid"></div>
+        </section>
+
+        <section class="workspace hidden" id="notesView">
+          <div class="page-head"><div><p class="eyebrow">CAPTURE</p><h1>Notes</h1></div><div class="quick-actions"><button data-voice-capture data-voice-hint="note">◉ Voice note</button><button class="primary" data-add="note">＋ New note</button></div></div>
+          <div id="allNotes" class="collection-grid notes-collection"></div>
+        </section>
+
+        <section class="workspace hidden" id="expensesView">
+          <div class="page-head"><div><p class="eyebrow">MONEY</p><h1>Expenses</h1><p id="expenseSummary"></p></div><div class="quick-actions"><button data-voice-capture data-voice-hint="expense">◉ Add by voice</button><button data-add="payment">＋ Payment reminder</button><button class="primary" data-add="expense">＋ Expense</button></div></div>
+          <div id="allExpenses" class="collection-grid"></div>
+        </section>
+
+        <section class="workspace hidden" id="habitsView">
+          <div class="page-head"><div><p class="eyebrow">CONSISTENCY</p><h1>Habit tracker</h1></div><div class="quick-actions"><button data-voice-capture data-voice-hint="habit">◉ Add by voice</button><button class="primary" data-add="habit">＋ New habit</button></div></div>
+          <div id="allHabits" class="collection-grid"></div>
+        </section>
+
+        <section class="workspace hidden" id="financeView">
+          <div class="page-head"><div><p class="eyebrow">READ-ONLY PORTFOLIO</p><h1>Smriti Finance</h1><p id="financeValuation">Transaction-led mutual-fund tracking with official AMFI NAVs.</p></div><div class="quick-actions"><button id="financeImportButton">↑ Import CSV</button><button id="financeAddButton">＋ Transaction</button><button class="primary" id="financeRefreshNav">↻ Refresh NAV</button></div></div>
+          <input id="financeImportFile" type="file" accept=".csv,text/csv" class="hidden" />
+          <div class="finance-notice" id="financeNotice">Planning tool only. Smriti does not place trades or provide tax-filing advice.</div>
+          <div class="finance-summary" id="financeSummary"></div>
+          <div class="finance-panel">
+            <div class="finance-panel-head"><div><p class="eyebrow">HOLDINGS</p><h2>My mutual funds</h2></div><span id="financeWarning"></span></div>
+            <div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>Scheme</th><th>Units</th><th>Cost</th><th>NAV</th><th>Value</th><th>Gain</th></tr></thead><tbody id="financeHoldings"></tbody></table></div>
+          </div>
+          <div class="finance-panel">
+            <div class="finance-panel-head"><div><p class="eyebrow">AUDIT TRAIL</p><h2>Recent imports</h2></div><a id="financeCsvTemplate" href="data:text/csv;charset=utf-8,transaction_date%2Cscheme_name%2Camfi_code%2Cfolio%2Ctransaction_type%2Camount%2Cunits%2Cnav%2Cdescription%0A2026-01-15%2CExample%20Fund%20-%20Direct%20-%20Growth%2C123456%2C12345%2Csip%2C5000%2C42.123%2C118.70%2CMonthly%20SIP" download="smriti-mf-template.csv">Download CSV template</a></div>
+            <div id="financeImports" class="item-list"></div>
+          </div>
+        </section>
+
+        <section class="workspace hidden" id="discoverView">
+          <div class="page-head"><div><p class="eyebrow">LEARN REGULARLY</p><h1>Discover</h1><p id="discoverSummary">AI news and research updates saved on this Mac.</p></div><div class="quick-actions"><button id="createReadingHabit">＋ Reading habit</button><button class="primary" id="refreshDiscover">↻ Refresh sources</button></div></div>
+          <form class="discover-toolbar" id="discoverSearch">
+            <input id="discoverQuery" type="search" placeholder="Search saved updates…" aria-label="Search saved updates" />
+            <select id="discoverViewFilter" aria-label="Filter reading items"><option value="all">All updates</option><option value="unread">Unread</option><option value="saved">Saved</option></select>
+            <button type="submit">Search</button>
+          </form>
+          <div id="discoverItems" class="reading-list"></div>
+        </section>
+
+        <footer class="composer-wrap hidden" id="composerWrap">
+          <form class="composer" id="chatForm">
+            <textarea id="messageInput" rows="1" placeholder="Message Smriti…" aria-label="Message"></textarea>
+            <button type="submit" id="sendButton" aria-label="Send message">↑</button>
+          </form>
+          <p>Smriti can make mistakes. Check important information.</p>
+        </footer>
+      </main>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+    <dialog id="settingsDialog">
+      <form method="dialog" class="settings-card" id="settingsForm">
+        <div class="dialog-head"><div><p class="eyebrow">PREFERENCES</p><h2>Settings</h2></div><button type="button" data-dialog-close class="icon-button" aria-label="Close settings">×</button></div>
+        <label for="modelInput">Ollama model</label>
+        <input id="modelInput" name="model" autocomplete="off" />
+        <p class="field-help">Use the exact name shown by <code>ollama list</code>.</p>
+        <label for="providerInput">AI provider</label>
+        <select id="providerInput"><option value="ollama">Local Ollama</option><option value="groq">Groq cloud</option></select>
+        <label for="groqModelInput">Groq model</label>
+        <input id="groqModelInput" autocomplete="off" value="qwen/qwen3.8-27b" />
+        <p class="field-help" id="groqHelp">Groq requires <code>GROQ_API_KEY</code> in the environment.</p>
+        <div id="mobileCloudSettings" class="hidden">
+          <label for="cloudEndpointInput">Smriti cloud endpoint</label><input id="cloudEndpointInput" type="url" placeholder="https://your-worker.workers.dev" />
+          <label for="appTokenInput">Private app token</label><input id="appTokenInput" type="password" autocomplete="off" />
+          <p class="field-help">The Groq key stays in the Cloudflare Worker. This phone stores only the private app token.</p>
+        </div>
+        <div class="dialog-actions"><button type="button" data-dialog-close class="secondary">Cancel</button><button value="default" id="saveSettings">Save changes</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="itemDialog">
+      <form method="dialog" class="settings-card" id="itemForm">
+        <div class="dialog-head"><div><p class="eyebrow" id="itemEyebrow">NEW</p><h2 id="itemHeading">Add item</h2></div><button type="button" data-dialog-close class="icon-button" aria-label="Close form">×</button></div>
+        <input type="hidden" id="itemType" />
+        <label for="itemTitle">Title</label><input id="itemTitle" required maxlength="300" />
+        <label for="itemDetails">Details</label><textarea id="itemDetails" rows="4"></textarea>
+        <div id="taskFields" class="conditional-fields">
+          <label for="taskDue">Due date and time</label><input id="taskDue" type="datetime-local" />
+          <label for="taskPriority">Priority</label><select id="taskPriority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
+          <label class="check-label"><input id="taskReminder" type="checkbox" /> Notify me when due</label>
+        </div>
+        <div id="eventFields" class="conditional-fields hidden">
+          <label for="eventStart">Starts</label><input id="eventStart" type="datetime-local" />
+          <label for="eventEnd">Ends</label><input id="eventEnd" type="datetime-local" />
+          <label for="eventReminder">Reminder</label><select id="eventReminder"><option value="0">At start time</option><option value="15" selected>15 minutes before</option><option value="60">1 hour before</option><option value="1440">1 day before</option></select>
+        </div>
+        <div id="noteFields" class="conditional-fields hidden"><label class="check-label"><input id="notePinned" type="checkbox" /> Pin to Today</label></div>
+        <div id="expenseFields" class="conditional-fields hidden">
+          <label for="expenseAmount">Amount</label><input id="expenseAmount" type="number" min="0.01" step="0.01" inputmode="decimal" />
+          <label for="expenseCategory">Category</label><select id="expenseCategory"><option>Food</option><option>Transport</option><option>Shopping</option><option>Bills</option><option>Health</option><option>Education</option><option>Other</option></select>
+          <label for="expenseDate">Date</label><input id="expenseDate" type="date" />
+          <label for="expenseMethod">Payment method</label><select id="expenseMethod"><option>UPI</option><option>Cash</option><option>Card</option><option>Bank transfer</option><option>Other</option></select>
+        </div>
+        <div id="paymentFields" class="conditional-fields hidden">
+          <label for="paymentAmount">Amount (optional)</label><input id="paymentAmount" type="number" min="0" step="0.01" inputmode="decimal" />
+          <label for="paymentDue">Due date and time</label><input id="paymentDue" type="datetime-local" />
+          <label for="paymentRepeat">Repeat</label><select id="paymentRepeat"><option value="none">Once</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select>
+        </div>
+        <div id="habitFields" class="conditional-fields hidden">
+          <label for="habitFrequency">Frequency</label><select id="habitFrequency"><option value="daily">Daily</option><option value="weekly">Weekly</option></select>
+          <label for="habitTarget">Target count</label><input id="habitTarget" type="number" min="1" max="100" value="1" />
+        </div>
+        <div class="dialog-actions"><button type="button" data-dialog-close class="secondary">Cancel</button><button value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="financeTransactionDialog">
+      <form method="dialog" class="settings-card" id="financeTransactionForm">
+        <div class="dialog-head"><div><p class="eyebrow">SOURCE TRANSACTION</p><h2>Add mutual-fund transaction</h2></div><button type="button" data-dialog-close class="icon-button" aria-label="Close form">×</button></div>
+        <label for="mfSchemeName">Scheme name</label><input id="mfSchemeName" required maxlength="500" />
+        <label for="mfAmfiCode">AMFI scheme code</label><input id="mfAmfiCode" inputmode="numeric" maxlength="20" required />
+        <label for="mfFolio">Folio (optional)</label><input id="mfFolio" maxlength="100" />
+        <label for="mfTransactionDate">Transaction date</label><input id="mfTransactionDate" type="date" required />
+        <label for="mfTransactionType">Transaction type</label><select id="mfTransactionType"><option value="purchase">Purchase</option><option value="sip">SIP</option><option value="redemption">Redemption</option><option value="switch_in">Switch in</option><option value="switch_out">Switch out</option><option value="reinvestment">Reinvestment</option><option value="dividend">Distribution</option></select>
+        <label for="mfAmount">Amount (₹)</label><input id="mfAmount" type="text" inputmode="decimal" required placeholder="5000.00" />
+        <label for="mfUnits">Units</label><input id="mfUnits" type="text" inputmode="decimal" required placeholder="42.1234" />
+        <label for="mfNav">Transaction NAV (optional)</label><input id="mfNav" type="text" inputmode="decimal" placeholder="118.70" />
+        <label for="mfDescription">Description</label><input id="mfDescription" maxlength="1000" />
+        <div class="dialog-actions"><button type="button" data-dialog-close class="secondary">Cancel</button><button value="default">Save transaction</button></div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="/static/mobile-store.js" defer></script>
+    <script src="/static/app.js" defer></script>
+    <script src="/static/voice-capture.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "smriti-personal-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Smriti — an offline-first personal assistant for Android",
+  "scripts": {
+    "build:web": "node scripts/build-mobile.mjs",
+    "android:sync": "npm run build:web && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/local-notifications": "^8.0.0",
+    "@capacitor/preferences": "^8.0.0",
+    "@ebarooni/capacitor-calendar": "^8.10.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}

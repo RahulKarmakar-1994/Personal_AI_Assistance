@@ -1,0 +1,12 @@
+{
+  "appId": "in.rahulkarmakar.smriti",
+  "appName": "Smriti",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#163e31"
+    }
+  }
+}
+
